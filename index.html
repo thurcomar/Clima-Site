@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e Consulta de Clima</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-box {
+            max-width: 300px;
+            background: #f1f7fe;
+            overflow: hidden;
+            border-radius: 16px;
+            color: #010101;
+            margin-right: 20px;
+        }
+
+        .form {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px 24px;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 1.6rem;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .form-container {
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: #fff;
+            margin: 1rem 0 .5rem;
+            width: 100%;
+        }
+
+        .input {
+            background: none;
+            border: 0;
+            outline: 0;
+            height: 40px;
+            width: 100%;
+            border-bottom: 1px solid #eee;
+            font-size: .9rem;
+            padding: 8px 15px;
+        }
+
+        .form-section {
+            padding: 16px;
+            font-size: .85rem;
+            background-color: #e0ecfb;
+            box-shadow: rgb(0 0 0 / 8%) 0 -1px;
+        }
+
+        .form-section a {
+            font-weight: bold;
+            color: #0066ff;
+            transition: color .3s ease;
+        }
+
+        .form-section a:hover {
+            color: #005ce6;
+            text-decoration: underline;
+        }
+
+        .form button {
+            background-color: #0066ff;
+            color: #fff;
+            border: 0;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color .3s ease, transform 0.2s ease; 
+        }
+
+        .form button:hover {
+            background-color: #005ce6;
+            transform: scale(1.05); 
+        }
+
+        .card {
+            position: relative;
+            width: 650px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            overflow: hidden;
+            display: none; 
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: opacity 0.5s ease, transform 0.5s ease; 
+        }
+
+        .card.show {
+            display: block; 
+            opacity: 1;
+            transform: translateY(0); 
+        }
+
+        .landscape-section {
+            position: relative;
+            width: 100%;
+            height: 200px;
+        }
+
+        .sky {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(247, 225, 87, 1) 0%, rgba(233, 101, 148, 1) 100%);
+        }
+
+        .sun {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: white;
+            bottom: 60%;
+            left: 20%;
+            filter: drop-shadow(0px 0px 10px white);
+        }
+
+        .ocean {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 28%;
+            background: linear-gradient(0deg, rgba(241, 192, 125, 1) 0%, rgba(247, 218, 150, 1) 100%);
+        }
+
+        .hill-1, .hill-2, .hill-3, .hill-4 {
+            position: absolute;
+            border-radius: 50%;
+            background-color: #e6b29d;
+        }
+
+        .hill-1 {
+            width: 150px;
+            height: 40px;
+            right: -25%;
+            bottom: 20%;
+        }
+
+        .hill-2 {
+            width: 150px;
+            height: 80px;
+            right: -36%;
+            bottom: 10%;
+            background-color: #c29182;
+        }
+
+        .content-section {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .weather-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: #333;
+            opacity: 0; 
+            transform: translateY(-10px); 
+            transition: opacity 0.5s ease, transform 0.5s ease; 
+        }
+
+        .weather-info.show {
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+
+        .temperature {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .forecast {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .separator {
+            width: 100%;
+            height: 1px;
+            background-color: #ddd;
+            margin: 10px 0;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <form class="form" id="registrationForm">
+            <h2 class="title">Cadastro</h2>
+            <p class="subtitle">Preencha suas informações</p>
+            <div class="form-container">
+                <input type="text" class="input" placeholder="Nome" required>
+                <input type="email" class="input" placeholder="Email" required>
+            </div>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+
+    <div class="card" id="weatherCard">
+        <section class="landscape-section">
+            <div class="sky"></div>
+            <div class="sun"></div>
+            <div class="ocean">
+                <div class="reflection"></div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2 class="title">Consulta de Clima</h2>
+            <input type="text" id="cityInput" class="input" placeholder="Digite o nome da cidade">
+            <button id="searchButton">Buscar</button>
+            <div id="weatherInfo" class="weather-info"></div>
+            <div id="errorMessage" class="error-message"></div>
+        </section>
+    </div>
+
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        const weatherCard = document.getElementById('weatherCard');
+
+        registrationForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            registrationForm.reset();
+            registrationForm.classList.add('hidden');
+            weatherCard.classList.add('show');
+            
+            setTimeout(() => {
+                registrationForm.style.display = 'none'; 
+            }, 500);
+        });
+
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const cityInput = document.getElementById('cityInput').value;
+            const validCity = 'Pindamonhangaba';
+            const apiKey = '363d4be4931fa771d6d617d7f837b98a';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${validCity}&appid=${apiKey}&units=metric`;
+
+            if (cityInput.toLowerCase() !== validCity.toLowerCase()) {
+                document.getElementById('errorMessage').textContent = 'Desculpe, não posso fornecer o clima para essa cidade.';
+                document.getElementById('weatherInfo').innerHTML = '';
+                return;
+            }
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar dados climáticos');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const temperature = Math.round(data.main.temp);
+                    const weatherInfo = `
+                        <div class="left-side">
+                            <div class="icon">
+                                <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="Condição do tempo">
+                            </div>
+                        </div>
+                        <div class="right-side">
+                            <div class="temperature">${temperature}°C</div>
+                            <div class="forecast">${data.weather[0].description}</div>
+                        </div>
+                    `;
+
+                    document.getElementById('weatherInfo').innerHTML = weatherInfo;
+                    document.getElementById('errorMessage').textContent = '';
+
+                    const weatherInfoDiv = document.getElementById('weatherInfo');
+                    weatherInfoDiv.classList.add('show'); 
+                })
+                .catch(error => {
+                    document.getElementById('errorMessage').textContent = error.message;
+                    document.getElementById('weatherInfo').innerHTML = '';
+                });
+        });
+    </script>
+</body>
+</html>
